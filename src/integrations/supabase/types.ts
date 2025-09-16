@@ -14,7 +14,54 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      registrations: {
+        Row: {
+          college_name: string
+          created_at: string
+          department: string
+          email: string
+          event_name: string
+          id: string
+          phone: string | null
+          student_name: string
+          team_member1: string
+          team_member2: string | null
+          team_member3: string | null
+          uploaded_file_path: string | null
+          year: number
+        }
+        Insert: {
+          college_name: string
+          created_at?: string
+          department: string
+          email: string
+          event_name: string
+          id?: string
+          phone?: string | null
+          student_name: string
+          team_member1: string
+          team_member2?: string | null
+          team_member3?: string | null
+          uploaded_file_path?: string | null
+          year: number
+        }
+        Update: {
+          college_name?: string
+          created_at?: string
+          department?: string
+          email?: string
+          event_name?: string
+          id?: string
+          phone?: string | null
+          student_name?: string
+          team_member1?: string
+          team_member2?: string | null
+          team_member3?: string | null
+          uploaded_file_path?: string | null
+          year?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
