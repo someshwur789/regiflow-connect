@@ -13,6 +13,7 @@ import { EVENTS, type EventName } from '@/types/registration';
 
 const Index = () => {
   const [selectedEvent, setSelectedEvent] = useState<EventName>('Paper Quest');
+  const [showAdminLogin, setShowAdminLogin] = useState(false);
   const [showAdmin, setShowAdmin] = useState(false);
   const [adminPassword, setAdminPassword] = useState('');
   const [adminError, setAdminError] = useState('');
@@ -24,6 +25,7 @@ const Index = () => {
   const handleAdminLogin = () => {
     if (adminPassword === 'somesh1420') {
       setShowAdmin(true);
+      setShowAdminLogin(false);
       setAdminError('');
     } else {
       setAdminError('Invalid password');
@@ -32,6 +34,7 @@ const Index = () => {
 
   const handleAdminLogout = () => {
     setShowAdmin(false);
+    setShowAdminLogin(false);
     setAdminPassword('');
     setAdminError('');
   };
@@ -55,7 +58,7 @@ const Index = () => {
             <Button 
               variant="outline" 
               size="sm"
-              onClick={() => setShowAdmin(!showAdmin)}
+              onClick={() => setShowAdminLogin(true)}
               className="text-xs"
             >
               Admin Login
@@ -72,7 +75,7 @@ const Index = () => {
         </div>
 
         {/* Admin Login Modal */}
-        {!showAdmin && adminPassword !== '' && (
+        {showAdminLogin && (
           <Card className="max-w-sm mx-auto mb-6">
             <CardHeader>
               <CardTitle className="text-lg">Admin Login</CardTitle>
@@ -97,7 +100,11 @@ const Index = () => {
                 </Button>
                 <Button 
                   variant="outline" 
-                  onClick={() => { setAdminPassword(''); setAdminError(''); }}
+                  onClick={() => { 
+                    setAdminPassword(''); 
+                    setAdminError(''); 
+                    setShowAdminLogin(false);
+                  }}
                   size="sm"
                 >
                   Cancel
