@@ -33,6 +33,27 @@ export const useRegistrations = () => {
         .single();
 
       if (error) throw error;
+      
+      // Send on-duty email after successful registration
+      try {
+        const { error: emailError } = await supabase.functions.invoke('send-on-duty-email', {
+          body: {
+            studentName: registration.student_name,
+            email: registration.email,
+            collegeName: registration.college_name,
+            eventName: registration.event_name,
+          },
+        });
+        
+        if (emailError) {
+          console.error('Email sending failed:', emailError);
+          // Don't fail the registration if email fails
+        }
+      } catch (emailError) {
+        console.error('Email function call failed:', emailError);
+        // Don't fail the registration if email fails
+      }
+      
       await fetchRegistrations(); // Refresh data
       return { success: true, data };
     } catch (error: any) {

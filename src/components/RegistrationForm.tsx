@@ -101,7 +101,7 @@ export function RegistrationForm({ selectedEvent, isDisabled }: RegistrationForm
       if (result.success) {
         toast({
           title: 'Registration successful!',
-          description: `You have been registered for ${selectedEvent}.`
+          description: `You have been registered for ${selectedEvent}. Check your email for the "On-Duty" request letter.`
         });
         
         // Reset form
