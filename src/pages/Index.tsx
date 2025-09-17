@@ -72,23 +72,15 @@ const Index = () => {
           <Tabs value={selectedEvent} onValueChange={value => setSelectedEvent(value as EventName)}>
             <TabsList className="grid w-full grid-cols-5 mb-8 bg-muted/50 max-w-4xl mx-auto">
               {EVENTS.map(event => {
-                const config = EVENT_CONFIGS.find(c => c.name === event)!;
-                const isFull = isEventFull(event);
-                return <TabsTrigger 
-                  key={event} 
-                  value={event} 
-                  disabled={isFull} 
-                  className="text-xs sm:text-sm relative flex flex-col gap-1 py-3 data-[state=active]:bg-gradient-primary data-[state=active]:text-white"
-                >
+              const config = EVENT_CONFIGS.find(c => c.name === event)!;
+              const isFull = isEventFull(event);
+              return <TabsTrigger key={event} value={event} disabled={isFull} className="text-xs sm:text-sm relative flex flex-col gap-1 py-3 data-[state=active]:bg-gradient-primary data-[state=active]:text-white">
                   <span>{event}</span>
-                  <Badge 
-                    variant="secondary" 
-                    className={`text-xs ${config.category === 'Technical' ? 'bg-technical/10 text-technical' : 'bg-non-technical/10 text-non-technical'}`}
-                  >
+                  <Badge variant="secondary" className={`text-xs ${config.category === 'Technical' ? 'bg-technical/10 text-technical' : 'bg-non-technical/10 text-non-technical'}`}>
                     {config.category}
                   </Badge>
                 </TabsTrigger>;
-              })}
+            })}
             </TabsList>
 
         {/* Admin Login Modal */}
@@ -107,10 +99,10 @@ const Index = () => {
                   Login
                 </Button>
                 <Button variant="outline" onClick={() => {
-              setAdminPassword('');
-              setAdminError('');
-              setShowAdminLogin(false);
-            }} size="sm">
+                  setAdminPassword('');
+                  setAdminError('');
+                  setShowAdminLogin(false);
+                }} size="sm">
                   Cancel
                 </Button>
               </div>
@@ -118,8 +110,8 @@ const Index = () => {
           </Card>}
 
             {EVENTS.map(event => {
-              const config = EVENT_CONFIGS.find(c => c.name === event)!;
-              return <TabsContent key={event} value={event} className="space-y-6">
+            const config = EVENT_CONFIGS.find(c => c.name === event)!;
+            return <TabsContent key={event} value={event} className="space-y-6">
                     <Card className="border-0 shadow-card">
                       <CardHeader>
                         <div className="flex items-center justify-between">
@@ -129,9 +121,7 @@ const Index = () => {
                               {config.category}
                             </Badge>
                           </CardTitle>
-                          <Badge variant="outline" className="text-sm">
-                            Max Team Size: {config.maxTeamMembers}
-                          </Badge>
+                          
                         </div>
                         <CardDescription className="text-base">
                           {event === 'Paper Quest' && 'Present your research or project ideas with innovative solutions. File upload required for presentation materials.'}
@@ -142,11 +132,7 @@ const Index = () => {
                         </CardDescription>
                       </CardHeader>
                       <CardContent>
-                        {event === 'Paper Quest' && <Alert className="mb-6 border-primary/20 bg-primary/5">
-                            <AlertDescription>
-                              <strong>Special Requirement:</strong> Paper Quest requires uploading a presentation file (PPT, PPTX, or PDF) showcasing your research or project.
-                            </AlertDescription>
-                          </Alert>}
+                        {event === 'Paper Quest'}
                         
                         {isSelectedEventFull && <Alert className="mb-6 border-destructive/20 bg-destructive/5">
                             <AlertDescription className="text-destructive">
@@ -158,7 +144,7 @@ const Index = () => {
                       </CardContent>
                     </Card>
                   </TabsContent>;
-            })}
+          })}
           </Tabs>
         </div>
 

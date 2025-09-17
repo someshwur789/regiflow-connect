@@ -11,13 +11,14 @@ import { useRegistrations } from '@/hooks/useRegistrations';
 import { supabase } from '@/integrations/supabase/client';
 import { getEventConfig, type EventName, type Registration } from '@/types/registration';
 import { Upload, Users, FileText } from 'lucide-react';
-
 interface RegistrationFormProps {
   selectedEvent: EventName;
   isDisabled: boolean;
 }
-
-export function RegistrationForm({ selectedEvent, isDisabled }: RegistrationFormProps) {
+export function RegistrationForm({
+  selectedEvent,
+  isDisabled
+}: RegistrationFormProps) {
   const [formData, setFormData] = useState({
     email: '',
     student_name: '',
@@ -27,29 +28,28 @@ export function RegistrationForm({ selectedEvent, isDisabled }: RegistrationForm
     phone: '',
     team_member1: '',
     team_member2: '',
-    team_member3: '',
+    team_member3: ''
   });
   const [file, setFile] = useState<File | null>(null);
   const [submitting, setSubmitting] = useState(false);
-  
-  const { submitRegistration, checkEmailExists } = useRegistrations();
-  const { toast } = useToast();
-  
+  const {
+    submitRegistration,
+    checkEmailExists
+  } = useRegistrations();
+  const {
+    toast
+  } = useToast();
   const eventConfig = getEventConfig(selectedEvent);
-
   const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
   };
-
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
     if (selectedFile) {
-      const allowedTypes = [
-        'application/vnd.ms-powerpoint',
-        'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-        'application/pdf'
-      ];
-      
+      const allowedTypes = ['application/vnd.ms-powerpoint', 'application/vnd.openxmlformats-officedocument.presentationml.presentation', 'application/pdf'];
       if (allowedTypes.includes(selectedFile.type)) {
         setFile(selectedFile);
       } else {
@@ -62,21 +62,18 @@ export function RegistrationForm({ selectedEvent, isDisabled }: RegistrationForm
       }
     }
   };
-
   const uploadFile = async (file: File, email: string) => {
     const fileName = `${email}-${Date.now()}-${file.name}`;
-    const { data, error } = await supabase.storage
-      .from('paper-quest-uploads')
-      .upload(fileName, file);
-
+    const {
+      data,
+      error
+    } = await supabase.storage.from('paper-quest-uploads').upload(fileName, file);
     if (error) throw error;
     return data.path;
   };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
-
     try {
       // Check if email already exists
       const emailExists = await checkEmailExists(formData.email);
@@ -98,28 +95,24 @@ export function RegistrationForm({ selectedEvent, isDisabled }: RegistrationForm
         });
         return;
       }
-
       let uploadedFilePath = null;
       if (eventConfig.requiresFile && file) {
         uploadedFilePath = await uploadFile(file, formData.email);
       }
-
       const registration: Omit<Registration, 'id' | 'created_at'> = {
         ...formData,
         year: parseInt(formData.year),
         event_name: selectedEvent,
         uploaded_file_path: uploadedFilePath
       };
-
       const result = await submitRegistration(registration);
-      
       if (result.success) {
         toast({
           title: 'Registration successful!',
           description: `You have been registered for ${selectedEvent}. Check your email for the "On-Duty" request letter.`,
-          duration: 5000,
+          duration: 5000
         });
-        
+
         // Reset form
         setFormData({
           email: '',
@@ -130,10 +123,10 @@ export function RegistrationForm({ selectedEvent, isDisabled }: RegistrationForm
           phone: '',
           team_member1: '',
           team_member2: '',
-          team_member3: '',
+          team_member3: ''
         });
         setFile(null);
-        
+
         // Reset file input
         const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
         if (fileInput) fileInput.value = '';
@@ -155,9 +148,7 @@ export function RegistrationForm({ selectedEvent, isDisabled }: RegistrationForm
       setSubmitting(false);
     }
   };
-
-  return (
-    <Card className="w-full max-w-3xl mx-auto border-0 shadow-elevated">
+  return <Card className="w-full max-w-3xl mx-auto border-0 shadow-elevated">
       <CardHeader className="pb-6">
         <div className="flex items-center justify-between">
           <CardTitle className="text-xl flex items-center gap-3">
@@ -170,9 +161,7 @@ export function RegistrationForm({ selectedEvent, isDisabled }: RegistrationForm
             <Badge className={eventConfig.category === 'Technical' ? 'bg-technical text-technical-foreground' : 'bg-non-technical text-non-technical-foreground'}>
               {eventConfig.category}
             </Badge>
-            <Badge variant="outline">
-              Team Size: {eventConfig.maxTeamMembers}
-            </Badge>
+            
           </div>
         </div>
       </CardHeader>
@@ -186,60 +175,27 @@ export function RegistrationForm({ selectedEvent, isDisabled }: RegistrationForm
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="email" className="text-sm font-medium">Email Address *</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) => handleInputChange('email', e.target.value)}
-                  required
-                  disabled={isDisabled}
-                  className="mt-1"
-                  placeholder="your.email@college.edu"
-                />
+                <Input id="email" type="email" value={formData.email} onChange={e => handleInputChange('email', e.target.value)} required disabled={isDisabled} className="mt-1" placeholder="your.email@college.edu" />
               </div>
               
               <div>
                 <Label htmlFor="student_name" className="text-sm font-medium">Full Name *</Label>
-                <Input
-                  id="student_name"
-                  value={formData.student_name}
-                  onChange={(e) => handleInputChange('student_name', e.target.value)}
-                  required
-                  disabled={isDisabled}
-                  className="mt-1"
-                  placeholder="Your full name"
-                />
+                <Input id="student_name" value={formData.student_name} onChange={e => handleInputChange('student_name', e.target.value)} required disabled={isDisabled} className="mt-1" placeholder="Your full name" />
               </div>
               
               <div>
                 <Label htmlFor="college_name" className="text-sm font-medium">College/University *</Label>
-                <Input
-                  id="college_name"
-                  value={formData.college_name}
-                  onChange={(e) => handleInputChange('college_name', e.target.value)}
-                  required
-                  disabled={isDisabled}
-                  className="mt-1"
-                  placeholder="Your college name"
-                />
+                <Input id="college_name" value={formData.college_name} onChange={e => handleInputChange('college_name', e.target.value)} required disabled={isDisabled} className="mt-1" placeholder="Your college name" />
               </div>
               
               <div>
                 <Label htmlFor="department" className="text-sm font-medium">Department *</Label>
-                <Input
-                  id="department"
-                  value={formData.department}
-                  onChange={(e) => handleInputChange('department', e.target.value)}
-                  required
-                  disabled={isDisabled}
-                  className="mt-1"
-                  placeholder="e.g., Computer Science"
-                />
+                <Input id="department" value={formData.department} onChange={e => handleInputChange('department', e.target.value)} required disabled={isDisabled} className="mt-1" placeholder="e.g., Computer Science" />
               </div>
               
               <div>
                 <Label htmlFor="year" className="text-sm font-medium">Academic Year *</Label>
-                <Select onValueChange={(value) => handleInputChange('year', value)} disabled={isDisabled} required>
+                <Select onValueChange={value => handleInputChange('year', value)} disabled={isDisabled} required>
                   <SelectTrigger className="mt-1">
                     <SelectValue placeholder="Select your year" />
                   </SelectTrigger>
@@ -254,76 +210,16 @@ export function RegistrationForm({ selectedEvent, isDisabled }: RegistrationForm
               
               <div>
                 <Label htmlFor="phone" className="text-sm font-medium">Phone Number</Label>
-                <Input
-                  id="phone"
-                  value={formData.phone}
-                  onChange={(e) => handleInputChange('phone', e.target.value)}
-                  disabled={isDisabled}
-                  className="mt-1"
-                  placeholder="+91 9876543210"
-                />
+                <Input id="phone" value={formData.phone} onChange={e => handleInputChange('phone', e.target.value)} disabled={isDisabled} className="mt-1" placeholder="+91 9876543210" />
               </div>
             </div>
           </div>
           
           {/* Team Information */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold flex items-center gap-2">
-              <Users className="h-5 w-5" />
-              Team Members
-            </h3>
-            <Alert className="border-primary/20 bg-primary/5">
-              <AlertDescription>
-                <strong>Team Size:</strong> Maximum {eventConfig.maxTeamMembers} members allowed for {selectedEvent}.
-                {eventConfig.maxTeamMembers === 3 ? ' You can add up to 2 additional team members.' : ' You can add 1 additional team member.'}
-              </AlertDescription>
-            </Alert>
-            
-            <div className="space-y-4">
-              <div>
-                <Label htmlFor="team_member1" className="text-sm font-medium">Team Member 1 (You) *</Label>
-                <Input
-                  id="team_member1"
-                  value={formData.team_member1}
-                  onChange={(e) => handleInputChange('team_member1', e.target.value)}
-                  required
-                  disabled={isDisabled}
-                  className="mt-1"
-                  placeholder="Your name (team leader)"
-                />
-              </div>
-              
-              <div>
-                <Label htmlFor="team_member2" className="text-sm font-medium">Team Member 2</Label>
-                <Input
-                  id="team_member2"
-                  value={formData.team_member2}
-                  onChange={(e) => handleInputChange('team_member2', e.target.value)}
-                  disabled={isDisabled}
-                  className="mt-1"
-                  placeholder="Second team member (optional)"
-                />
-              </div>
-              
-              {eventConfig.maxTeamMembers === 3 && (
-                <div>
-                  <Label htmlFor="team_member3" className="text-sm font-medium">Team Member 3</Label>
-                  <Input
-                    id="team_member3"
-                    value={formData.team_member3}
-                    onChange={(e) => handleInputChange('team_member3', e.target.value)}
-                    disabled={isDisabled}
-                    className="mt-1"
-                    placeholder="Third team member (optional)"
-                  />
-                </div>
-              )}
-            </div>
-          </div>
+          
           
           {/* File Upload for Paper Quest */}
-          {eventConfig.requiresFile && (
-            <div className="space-y-4">
+          {eventConfig.requiresFile && <div className="space-y-4">
               <h3 className="text-lg font-semibold flex items-center gap-2">
                 <Upload className="h-5 w-5" />
                 Presentation Upload
@@ -336,51 +232,29 @@ export function RegistrationForm({ selectedEvent, isDisabled }: RegistrationForm
               </Alert>
               <div>
                 <Label htmlFor="file" className="text-sm font-medium">Upload Presentation (PPT, PPTX, PDF) *</Label>
-                <Input
-                  id="file"
-                  type="file"
-                  accept=".ppt,.pptx,.pdf"
-                  onChange={handleFileChange}
-                  required={eventConfig.requiresFile}
-                  disabled={isDisabled}
-                  className="mt-1"
-                />
-                {file && (
-                  <div className="mt-2 p-3 bg-muted/50 rounded-lg">
+                <Input id="file" type="file" accept=".ppt,.pptx,.pdf" onChange={handleFileChange} required={eventConfig.requiresFile} disabled={isDisabled} className="mt-1" />
+                {file && <div className="mt-2 p-3 bg-muted/50 rounded-lg">
                     <p className="text-sm font-medium text-muted-foreground flex items-center gap-2">
                       <FileText className="h-4 w-4" />
                       Selected: {file.name}
                     </p>
-                  </div>
-                )}
+                  </div>}
               </div>
-            </div>
-          )}
+            </div>}
           
-          <Button 
-            type="submit" 
-            className="w-full h-12 text-base font-semibold bg-gradient-primary hover:opacity-90 transition-opacity"
-            disabled={isDisabled || submitting}
-          >
-            {submitting ? (
-              <div className="flex items-center gap-2">
+          <Button type="submit" className="w-full h-12 text-base font-semibold bg-gradient-primary hover:opacity-90 transition-opacity" disabled={isDisabled || submitting}>
+            {submitting ? <div className="flex items-center gap-2">
                 <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
                 Registering...
-              </div>
-            ) : (
-              `Register for ${selectedEvent}`
-            )}
+              </div> : `Register for ${selectedEvent}`}
           </Button>
           
-          {isDisabled && (
-            <Alert className="border-destructive/20 bg-destructive/5">
+          {isDisabled && <Alert className="border-destructive/20 bg-destructive/5">
               <AlertDescription className="text-destructive">
                 Registration is currently closed for {selectedEvent}. Maximum capacity of 20 participants has been reached.
               </AlertDescription>
-            </Alert>
-          )}
+            </Alert>}
         </form>
       </CardContent>
-    </Card>
-  );
+    </Card>;
 }
