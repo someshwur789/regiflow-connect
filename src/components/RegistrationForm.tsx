@@ -375,7 +375,7 @@ export function RegistrationForm({ selectedEvent, isDisabled }: RegistrationForm
           {isDisabled && (
             <Alert className="border-destructive/20 bg-destructive/5">
               <AlertDescription className="text-destructive">
-                Registration is currently closed for {eventConfig.category.toLowerCase()} events.
+                Registration is currently closed for {selectedEvent}. Maximum capacity of 20 participants has been reached.
               </AlertDescription>
             </Alert>
           )}

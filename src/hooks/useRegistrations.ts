@@ -7,6 +7,7 @@ export const useRegistrations = () => {
   const [totalCount, setTotalCount] = useState(0);
   const [technicalCount, setTechnicalCount] = useState(0);
   const [nonTechnicalCount, setNonTechnicalCount] = useState(0);
+  const [eventCounts, setEventCounts] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(true);
 
   const fetchRegistrations = async () => {
@@ -29,6 +30,13 @@ export const useRegistrations = () => {
       
       setTechnicalCount(techCount);
       setNonTechnicalCount(nonTechCount);
+      
+      // Calculate per-event counts
+      const counts: Record<string, number> = {};
+      data?.forEach(reg => {
+        counts[reg.event_name] = (counts[reg.event_name] || 0) + 1;
+      });
+      setEventCounts(counts);
     } catch (error) {
       console.error('Error fetching registrations:', error);
     } finally {
@@ -38,6 +46,15 @@ export const useRegistrations = () => {
 
   const submitRegistration = async (registration: Omit<Registration, 'id' | 'created_at'>) => {
     try {
+      // Check if event is full before submitting
+      const currentCount = eventCounts[registration.event_name] || 0;
+      if (currentCount >= 20) {
+        return {
+          success: false,
+          error: `${registration.event_name} is full. Maximum 20 registrations allowed.`
+        };
+      }
+
       const { data, error } = await supabase
         .from('registrations')
         .insert([registration])
@@ -93,6 +110,14 @@ export const useRegistrations = () => {
     }
   };
 
+  const getEventRegistrationCount = (eventName: string) => {
+    return eventCounts[eventName] || 0;
+  };
+
+  const isEventFull = (eventName: string) => {
+    return getEventRegistrationCount(eventName) >= 20;
+  };
+
   useEffect(() => {
     fetchRegistrations();
   }, []);
@@ -102,9 +127,12 @@ export const useRegistrations = () => {
     totalCount,
     technicalCount,
     nonTechnicalCount,
+    eventCounts,
     loading,
     submitRegistration,
     checkEmailExists,
+    getEventRegistrationCount,
+    isEventFull,
     refetch: fetchRegistrations
   };
 };

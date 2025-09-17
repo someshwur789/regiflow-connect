@@ -23,6 +23,7 @@ export interface EventConfig {
   category: EventCategory;
   maxTeamMembers: number;
   requiresFile: boolean;
+  maxRegistrations: number;
 }
 
 export const EVENT_CONFIGS: EventConfig[] = [
@@ -30,31 +31,36 @@ export const EVENT_CONFIGS: EventConfig[] = [
     name: 'Paper Quest',
     category: 'Technical',
     maxTeamMembers: 3,
-    requiresFile: true
+    requiresFile: true,
+    maxRegistrations: 20
   },
   {
     name: 'Hack\'n\'Hammer',
     category: 'Technical',
     maxTeamMembers: 3,
-    requiresFile: false
+    requiresFile: false,
+    maxRegistrations: 20
   },
   {
     name: 'Byte Fest',
     category: 'Technical',
     maxTeamMembers: 2,
-    requiresFile: false
+    requiresFile: false,
+    maxRegistrations: 20
   },
   {
     name: 'Cinephile',
     category: 'Non-Technical',
     maxTeamMembers: 2,
-    requiresFile: false
+    requiresFile: false,
+    maxRegistrations: 20
   },
   {
     name: 'e-sports',
     category: 'Non-Technical',
     maxTeamMembers: 2,
-    requiresFile: false
+    requiresFile: false,
+    maxRegistrations: 20
   }
 ];
 

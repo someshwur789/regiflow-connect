@@ -19,16 +19,13 @@ const Index = () => {
   const [adminPassword, setAdminPassword] = useState('');
   const [adminError, setAdminError] = useState('');
   
-  const { totalCount, technicalCount, nonTechnicalCount, loading } = useRegistrations();
+  const { totalCount, technicalCount, nonTechnicalCount, eventCounts, getEventRegistrationCount, isEventFull, loading } = useRegistrations();
   
   const technicalEvents = getTechnicalEvents();
   const nonTechnicalEvents = getNonTechnicalEvents();
   
-  const isTechnicalFull = technicalCount >= 50;
-  const isNonTechnicalFull = nonTechnicalCount >= 50;
-  
   const selectedEventConfig = EVENT_CONFIGS.find(config => config.name === selectedEvent);
-  const isSelectedEventFull = selectedEventConfig?.category === 'Technical' ? isTechnicalFull : isNonTechnicalFull;
+  const isSelectedEventFull = isEventFull(selectedEvent);
 
   const handleAdminLogin = () => {
     if (adminPassword === 'somesh1420') {
@@ -64,53 +61,45 @@ const Index = () => {
           </p>
           
           {/* Registration Statistics */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 max-w-4xl mx-auto">
-            <Card className="border-0 shadow-card bg-gradient-tech text-white">
-              <CardContent className="p-6 text-center">
-                <h3 className="text-lg font-semibold mb-2">Technical Events</h3>
-                <div className="text-3xl font-bold mb-2">{loading ? '...' : technicalCount}/50</div>
-                <Progress value={(technicalCount / 50) * 100} className="mb-2 bg-white/20" />
-                <Badge variant={isTechnicalFull ? "destructive" : "secondary"} className="text-xs">
-                  {isTechnicalFull ? 'Registration Closed' : 'Open for Registration'}
-                </Badge>
-              </CardContent>
-            </Card>
-            
-            <Card className="border-0 shadow-card bg-gradient-non-tech text-white">
-              <CardContent className="p-6 text-center">
-                <h3 className="text-lg font-semibold mb-2">Non-Technical Events</h3>
-                <div className="text-3xl font-bold mb-2">{loading ? '...' : nonTechnicalCount}/50</div>
-                <Progress value={(nonTechnicalCount / 50) * 100} className="mb-2 bg-white/20" />
-                <Badge variant={isNonTechnicalFull ? "destructive" : "secondary"} className="text-xs">
-                  {isNonTechnicalFull ? 'Registration Closed' : 'Open for Registration'}
-                </Badge>
-              </CardContent>
-            </Card>
-            
-            <Card className="border-0 shadow-card">
-              <CardContent className="p-6 text-center">
-                <h3 className="text-lg font-semibold mb-2">Total Registrations</h3>
-                <div className="text-3xl font-bold mb-2">{loading ? '...' : totalCount}/100</div>
-                <Progress value={(totalCount / 100) * 100} className="mb-2" />
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={() => setShowAdminLogin(true)}
-                  className="text-xs"
-                >
-                  Admin Login
-                </Button>
-              </CardContent>
-            </Card>
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8 max-w-6xl mx-auto">
+            {EVENTS.map((event) => {
+              const config = EVENT_CONFIGS.find(c => c.name === event)!;
+              const eventCount = getEventRegistrationCount(event);
+              const isFull = isEventFull(event);
+              
+              return (
+                <Card key={event} className="border-0 shadow-card">
+                  <CardContent className="p-4 text-center">
+                    <h3 className="text-sm font-semibold mb-2 truncate" title={event}>{event}</h3>
+                    <div className="text-2xl font-bold mb-2">{loading ? '...' : eventCount}/20</div>
+                    <Progress value={(eventCount / 20) * 100} className="mb-2 h-2" />
+                    <Badge 
+                      variant={isFull ? "destructive" : "secondary"} 
+                      className="text-xs"
+                    >
+                      {isFull ? 'Full' : `${20 - eventCount} left`}
+                    </Badge>
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
           
-          {(isTechnicalFull && isNonTechnicalFull) && (
-            <Alert className="mb-8 max-w-md mx-auto border-destructive">
-              <AlertDescription className="text-destructive">
-                All events are now closed. Maximum capacity has been reached for both categories.
-              </AlertDescription>
-            </Alert>
-          )}
+          <Card className="border-0 shadow-card mb-8 max-w-md mx-auto">
+            <CardContent className="p-6 text-center">
+              <h3 className="text-lg font-semibold mb-2">Total Registrations</h3>
+              <div className="text-3xl font-bold mb-2">{loading ? '...' : totalCount}/100</div>
+              <Progress value={(totalCount / 100) * 100} className="mb-2" />
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => setShowAdminLogin(true)}
+                className="text-xs"
+              >
+                Admin Login
+              </Button>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Admin Login Modal */}
@@ -166,22 +155,31 @@ const Index = () => {
               <TabsList className="grid w-full grid-cols-5 mb-8 bg-muted/50">
                 {EVENTS.map((event) => {
                   const config = EVENT_CONFIGS.find(c => c.name === event)!;
-                  const isEventCategoryFull = config.category === 'Technical' ? isTechnicalFull : isNonTechnicalFull;
+                  const eventCount = getEventRegistrationCount(event);
+                  const isFull = isEventFull(event);
                   
                   return (
                     <TabsTrigger 
                       key={event} 
                       value={event} 
-                      disabled={isEventCategoryFull}
+                      disabled={isFull}
                       className="text-xs sm:text-sm relative flex flex-col gap-1 py-3 data-[state=active]:bg-gradient-primary data-[state=active]:text-white"
                     >
                       <span>{event}</span>
-                      <Badge 
-                        variant="secondary" 
-                        className={`text-xs ${config.category === 'Technical' ? 'bg-technical/10 text-technical' : 'bg-non-technical/10 text-non-technical'}`}
-                      >
-                        {config.category}
-                      </Badge>
+                      <div className="flex flex-col gap-1">
+                        <Badge 
+                          variant="secondary" 
+                          className={`text-xs ${config.category === 'Technical' ? 'bg-technical/10 text-technical' : 'bg-non-technical/10 text-non-technical'}`}
+                        >
+                          {config.category}
+                        </Badge>
+                        <Badge 
+                          variant={isFull ? "destructive" : "outline"} 
+                          className="text-xs"
+                        >
+                          {eventCount}/20
+                        </Badge>
+                      </div>
                     </TabsTrigger>
                   );
                 })}
@@ -224,7 +222,7 @@ const Index = () => {
                         {isSelectedEventFull && (
                           <Alert className="mb-6 border-destructive/20 bg-destructive/5">
                             <AlertDescription className="text-destructive">
-                              Registration is closed for {config.category.toLowerCase()} events. The maximum capacity of 50 participants has been reached.
+                              Registration is closed for {event}. The maximum capacity of 20 participants has been reached.
                             </AlertDescription>
                           </Alert>
                         )}
