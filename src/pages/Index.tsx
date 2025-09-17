@@ -11,22 +11,25 @@ import { useRegistrations } from '@/hooks/useRegistrations';
 import { RegistrationForm } from '@/components/RegistrationForm';
 import { AdminDashboard } from '@/components/AdminDashboard';
 import { EVENTS, EVENT_CONFIGS, getTechnicalEvents, getNonTechnicalEvents, type EventName } from '@/types/registration';
-
 const Index = () => {
   const [selectedEvent, setSelectedEvent] = useState<EventName>('Paper Quest');
   const [showAdminLogin, setShowAdminLogin] = useState(false);
   const [showAdmin, setShowAdmin] = useState(false);
   const [adminPassword, setAdminPassword] = useState('');
   const [adminError, setAdminError] = useState('');
-  
-  const { totalCount, technicalCount, nonTechnicalCount, eventCounts, getEventRegistrationCount, isEventFull, loading } = useRegistrations();
-  
+  const {
+    totalCount,
+    technicalCount,
+    nonTechnicalCount,
+    eventCounts,
+    getEventRegistrationCount,
+    isEventFull,
+    loading
+  } = useRegistrations();
   const technicalEvents = getTechnicalEvents();
   const nonTechnicalEvents = getNonTechnicalEvents();
-  
   const selectedEventConfig = EVENT_CONFIGS.find(config => config.name === selectedEvent);
   const isSelectedEventFull = isEventFull(selectedEvent);
-
   const handleAdminLogin = () => {
     if (adminPassword === 'somesh1420') {
       setShowAdmin(true);
@@ -36,20 +39,16 @@ const Index = () => {
       setAdminError('Invalid password');
     }
   };
-
   const handleAdminLogout = () => {
     setShowAdmin(false);
     setShowAdminLogin(false);
     setAdminPassword('');
     setAdminError('');
   };
-
   if (showAdmin) {
     return <AdminDashboard onLogout={handleAdminLogout} />;
   }
-
-  return (
-    <div className="min-h-screen bg-gradient-background">
+  return <div className="min-h-screen bg-gradient-background">
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="text-center mb-12">
@@ -62,40 +61,23 @@ const Index = () => {
           
           {/* Registration Statistics */}
           <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8 max-w-6xl mx-auto">
-            {EVENTS.map((event) => {
-              const config = EVENT_CONFIGS.find(c => c.name === event)!;
-              const eventCount = getEventRegistrationCount(event);
-              const isFull = isEventFull(event);
-              
-              return (
-                <Card key={event} className="border-0 shadow-card">
-                  <CardContent className="p-4 text-center">
-                    <h3 className="text-sm font-semibold mb-2 truncate" title={event}>{event}</h3>
-                    <div className="text-2xl font-bold mb-2">{loading ? '...' : eventCount}/20</div>
-                    <Progress value={(eventCount / 20) * 100} className="mb-2 h-2" />
-                    <Badge 
-                      variant={isFull ? "destructive" : "secondary"} 
-                      className="text-xs"
-                    >
-                      {isFull ? 'Full' : `${20 - eventCount} left`}
-                    </Badge>
-                  </CardContent>
-                </Card>
-              );
-            })}
+            {EVENTS.map(event => {
+            const config = EVENT_CONFIGS.find(c => c.name === event)!;
+            const eventCount = getEventRegistrationCount(event);
+            const isFull = isEventFull(event);
+            return <Card key={event} className="border-0 shadow-card">
+                  
+                </Card>;
+          })}
           </div>
           
           <Card className="border-0 shadow-card mb-8 max-w-md mx-auto">
             <CardContent className="p-6 text-center">
-              <h3 className="text-lg font-semibold mb-2">Total Registrations</h3>
-              <div className="text-3xl font-bold mb-2">{loading ? '...' : totalCount}/100</div>
-              <Progress value={(totalCount / 100) * 100} className="mb-2" />
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={() => setShowAdminLogin(true)}
-                className="text-xs"
-              >
+              <h3 className="text-lg font-semibold mb-2">
+            </h3>
+              
+              
+              <Button variant="outline" size="sm" onClick={() => setShowAdminLogin(true)} className="text-xs">
                 Admin Login
               </Button>
             </CardContent>
@@ -103,44 +85,30 @@ const Index = () => {
         </div>
 
         {/* Admin Login Modal */}
-        {showAdminLogin && (
-          <Card className="max-w-sm mx-auto mb-8 shadow-elevated">
+        {showAdminLogin && <Card className="max-w-sm mx-auto mb-8 shadow-elevated">
             <CardHeader>
               <CardTitle className="text-lg">Admin Login</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
                 <Label htmlFor="admin-password">Password</Label>
-                <Input
-                  id="admin-password"
-                  type="password"
-                  value={adminPassword}
-                  onChange={(e) => setAdminPassword(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && handleAdminLogin()}
-                />
+                <Input id="admin-password" type="password" value={adminPassword} onChange={e => setAdminPassword(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleAdminLogin()} />
               </div>
-              {adminError && (
-                <p className="text-sm text-destructive">{adminError}</p>
-              )}
+              {adminError && <p className="text-sm text-destructive">{adminError}</p>}
               <div className="flex gap-2">
                 <Button onClick={handleAdminLogin} size="sm" className="flex-1">
                   Login
                 </Button>
-                <Button 
-                  variant="outline" 
-                  onClick={() => { 
-                    setAdminPassword(''); 
-                    setAdminError(''); 
-                    setShowAdminLogin(false);
-                  }}
-                  size="sm"
-                >
+                <Button variant="outline" onClick={() => {
+              setAdminPassword('');
+              setAdminError('');
+              setShowAdminLogin(false);
+            }} size="sm">
                   Cancel
                 </Button>
               </div>
             </CardContent>
-          </Card>
-        )}
+          </Card>}
 
         {/* Events Overview */}
         <Card className="mb-8 border-0 shadow-elevated">
@@ -151,44 +119,29 @@ const Index = () => {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Tabs value={selectedEvent} onValueChange={(value) => setSelectedEvent(value as EventName)}>
+            <Tabs value={selectedEvent} onValueChange={value => setSelectedEvent(value as EventName)}>
               <TabsList className="grid w-full grid-cols-5 mb-8 bg-muted/50">
-                {EVENTS.map((event) => {
-                  const config = EVENT_CONFIGS.find(c => c.name === event)!;
-                  const eventCount = getEventRegistrationCount(event);
-                  const isFull = isEventFull(event);
-                  
-                  return (
-                    <TabsTrigger 
-                      key={event} 
-                      value={event} 
-                      disabled={isFull}
-                      className="text-xs sm:text-sm relative flex flex-col gap-1 py-3 data-[state=active]:bg-gradient-primary data-[state=active]:text-white"
-                    >
+                {EVENTS.map(event => {
+                const config = EVENT_CONFIGS.find(c => c.name === event)!;
+                const eventCount = getEventRegistrationCount(event);
+                const isFull = isEventFull(event);
+                return <TabsTrigger key={event} value={event} disabled={isFull} className="text-xs sm:text-sm relative flex flex-col gap-1 py-3 data-[state=active]:bg-gradient-primary data-[state=active]:text-white">
                       <span>{event}</span>
                       <div className="flex flex-col gap-1">
-                        <Badge 
-                          variant="secondary" 
-                          className={`text-xs ${config.category === 'Technical' ? 'bg-technical/10 text-technical' : 'bg-non-technical/10 text-non-technical'}`}
-                        >
+                        <Badge variant="secondary" className={`text-xs ${config.category === 'Technical' ? 'bg-technical/10 text-technical' : 'bg-non-technical/10 text-non-technical'}`}>
                           {config.category}
                         </Badge>
-                        <Badge 
-                          variant={isFull ? "destructive" : "outline"} 
-                          className="text-xs"
-                        >
+                        <Badge variant={isFull ? "destructive" : "outline"} className="text-xs">
                           {eventCount}/20
                         </Badge>
                       </div>
-                    </TabsTrigger>
-                  );
-                })}
+                    </TabsTrigger>;
+              })}
               </TabsList>
 
-              {EVENTS.map((event) => {
-                const config = EVENT_CONFIGS.find(c => c.name === event)!;
-                return (
-                  <TabsContent key={event} value={event} className="space-y-6">
+              {EVENTS.map(event => {
+              const config = EVENT_CONFIGS.find(c => c.name === event)!;
+              return <TabsContent key={event} value={event} className="space-y-6">
                     <Card className="border-0 shadow-card">
                       <CardHeader>
                         <div className="flex items-center justify-between">
@@ -211,31 +164,23 @@ const Index = () => {
                         </CardDescription>
                       </CardHeader>
                       <CardContent>
-                        {event === 'Paper Quest' && (
-                          <Alert className="mb-6 border-primary/20 bg-primary/5">
+                        {event === 'Paper Quest' && <Alert className="mb-6 border-primary/20 bg-primary/5">
                             <AlertDescription>
                               <strong>Special Requirement:</strong> Paper Quest requires uploading a presentation file (PPT, PPTX, or PDF) showcasing your research or project.
                             </AlertDescription>
-                          </Alert>
-                        )}
+                          </Alert>}
                         
-                        {isSelectedEventFull && (
-                          <Alert className="mb-6 border-destructive/20 bg-destructive/5">
+                        {isSelectedEventFull && <Alert className="mb-6 border-destructive/20 bg-destructive/5">
                             <AlertDescription className="text-destructive">
                               Registration is closed for {event}. The maximum capacity of 20 participants has been reached.
                             </AlertDescription>
-                          </Alert>
-                        )}
+                          </Alert>}
                         
-                        <RegistrationForm 
-                          selectedEvent={event} 
-                          isDisabled={isSelectedEventFull}
-                        />
+                        <RegistrationForm selectedEvent={event} isDisabled={isSelectedEventFull} />
                       </CardContent>
                     </Card>
-                  </TabsContent>
-                );
-              })}
+                  </TabsContent>;
+            })}
             </Tabs>
           </CardContent>
         </Card>
@@ -246,8 +191,6 @@ const Index = () => {
           <p className="text-sm mt-2">For queries, contact the organizing committee.</p>
         </div>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default Index;
