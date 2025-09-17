@@ -51,7 +51,7 @@ const Index = () => {
   return <div className="min-h-screen bg-gradient-background">
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
-        <div className="text-center mb-12">
+        <div className="relative text-center mb-8">
           <h1 className="text-5xl font-bold mb-6 bg-gradient-primary bg-clip-text text-transparent">
             Event Registration Portal
           </h1>
@@ -59,30 +59,37 @@ const Index = () => {
             Join exciting technical and non-technical events. Register now and showcase your skills!
           </p>
           
-          {/* Registration Statistics */}
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8 max-w-6xl mx-auto">
-            {EVENTS.map(event => {
-            const config = EVENT_CONFIGS.find(c => c.name === event)!;
-            const eventCount = getEventRegistrationCount(event);
-            const isFull = isEventFull(event);
-            return <Card key={event} className="border-0 shadow-card">
-                  
-                </Card>;
-          })}
+          {/* Admin Login - Top Right */}
+          <div className="absolute top-0 right-0">
+            <Button variant="outline" size="sm" onClick={() => setShowAdminLogin(true)} className="text-xs">
+              Admin Login
+            </Button>
           </div>
-          
-          <Card className="border-0 shadow-card mb-8 max-w-md mx-auto">
-            <CardContent className="p-6 text-center">
-              <h3 className="text-lg font-semibold mb-2">
-            </h3>
-              
-              
-              <Button variant="outline" size="sm" onClick={() => setShowAdminLogin(true)} className="text-xs">
-                Admin Login
-              </Button>
-            </CardContent>
-          </Card>
         </div>
+
+        {/* Event Tabs */}
+        <div className="mb-8">
+          <Tabs value={selectedEvent} onValueChange={value => setSelectedEvent(value as EventName)}>
+            <TabsList className="grid w-full grid-cols-5 mb-8 bg-muted/50 max-w-4xl mx-auto">
+              {EVENTS.map(event => {
+                const config = EVENT_CONFIGS.find(c => c.name === event)!;
+                const isFull = isEventFull(event);
+                return <TabsTrigger 
+                  key={event} 
+                  value={event} 
+                  disabled={isFull} 
+                  className="text-xs sm:text-sm relative flex flex-col gap-1 py-3 data-[state=active]:bg-gradient-primary data-[state=active]:text-white"
+                >
+                  <span>{event}</span>
+                  <Badge 
+                    variant="secondary" 
+                    className={`text-xs ${config.category === 'Technical' ? 'bg-technical/10 text-technical' : 'bg-non-technical/10 text-non-technical'}`}
+                  >
+                    {config.category}
+                  </Badge>
+                </TabsTrigger>;
+              })}
+            </TabsList>
 
         {/* Admin Login Modal */}
         {showAdminLogin && <Card className="max-w-sm mx-auto mb-8 shadow-elevated">
@@ -110,36 +117,7 @@ const Index = () => {
             </CardContent>
           </Card>}
 
-        {/* Events Overview */}
-        <Card className="mb-8 border-0 shadow-elevated">
-          <CardHeader className="text-center">
-            <CardTitle className="text-2xl">Choose Your Event</CardTitle>
-            <CardDescription className="text-lg">
-              Select an event category and register for your preferred event.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Tabs value={selectedEvent} onValueChange={value => setSelectedEvent(value as EventName)}>
-              <TabsList className="grid w-full grid-cols-5 mb-8 bg-muted/50">
-                {EVENTS.map(event => {
-                const config = EVENT_CONFIGS.find(c => c.name === event)!;
-                const eventCount = getEventRegistrationCount(event);
-                const isFull = isEventFull(event);
-                return <TabsTrigger key={event} value={event} disabled={isFull} className="text-xs sm:text-sm relative flex flex-col gap-1 py-3 data-[state=active]:bg-gradient-primary data-[state=active]:text-white">
-                      <span>{event}</span>
-                      <div className="flex flex-col gap-1">
-                        <Badge variant="secondary" className={`text-xs ${config.category === 'Technical' ? 'bg-technical/10 text-technical' : 'bg-non-technical/10 text-non-technical'}`}>
-                          {config.category}
-                        </Badge>
-                        <Badge variant={isFull ? "destructive" : "outline"} className="text-xs">
-                          {eventCount}/20
-                        </Badge>
-                      </div>
-                    </TabsTrigger>;
-              })}
-              </TabsList>
-
-              {EVENTS.map(event => {
+            {EVENTS.map(event => {
               const config = EVENT_CONFIGS.find(c => c.name === event)!;
               return <TabsContent key={event} value={event} className="space-y-6">
                     <Card className="border-0 shadow-card">
@@ -181,9 +159,8 @@ const Index = () => {
                     </Card>
                   </TabsContent>;
             })}
-            </Tabs>
-          </CardContent>
-        </Card>
+          </Tabs>
+        </div>
 
         {/* Footer */}
         <div className="text-center text-muted-foreground">

@@ -6,7 +6,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useRegistrations } from '@/hooks/useRegistrations';
-import { EVENTS, getTechnicalEvents, getNonTechnicalEvents, getEventConfig } from '@/types/registration';
+import { EVENTS, EVENT_CONFIGS, getTechnicalEvents, getNonTechnicalEvents, getEventConfig } from '@/types/registration';
+import { Progress } from '@/components/ui/progress';
 import { supabase } from '@/integrations/supabase/client';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
@@ -26,7 +27,7 @@ declare module 'jspdf' {
 }
 
 export function AdminDashboard({ onLogout }: AdminDashboardProps) {
-  const { registrations, totalCount, technicalCount, nonTechnicalCount, loading } = useRegistrations();
+  const { registrations, totalCount, technicalCount, nonTechnicalCount, eventCounts, loading } = useRegistrations();
   const [eventFilter, setEventFilter] = useState<string>('all');
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -181,8 +182,34 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
           </CardHeader>
         </Card>
 
-        {/* Statistics Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        {/* Statistics Cards - Per Event */}
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
+          {EVENTS.map(event => {
+            const config = EVENT_CONFIGS.find(c => c.name === event)!;
+            const eventCount = eventCounts[event] || 0;
+            const percentage = (eventCount / 20) * 100;
+            
+            return (
+              <Card key={event} className="border-0 shadow-card">
+                <CardContent className="p-4 text-center">
+                  <div className="text-2xl font-bold text-primary mb-1">{eventCount}/20</div>
+                  <p className="text-xs font-medium mb-2">{event}</p>
+                  <Badge 
+                    variant="secondary" 
+                    className={`text-xs mb-2 ${config.category === 'Technical' ? 'bg-technical/10 text-technical' : 'bg-non-technical/10 text-non-technical'}`}
+                  >
+                    {config.category}
+                  </Badge>
+                  <Progress value={percentage} className="h-2" />
+                  <p className="text-xs text-muted-foreground mt-1">{Math.round(percentage)}% full</p>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
+
+        {/* Overall Summary */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <Card className="border-0 shadow-card">
             <CardContent className="p-6 text-center">
               <div className="text-3xl font-bold text-primary mb-2">{totalCount}</div>
@@ -192,14 +219,14 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
           
           <Card className="border-0 shadow-card bg-gradient-tech text-white">
             <CardContent className="p-6 text-center">
-              <div className="text-3xl font-bold mb-2">{technicalCount}/50</div>
+              <div className="text-3xl font-bold mb-2">{technicalCount}</div>
               <p className="text-sm opacity-90">Technical Events</p>
             </CardContent>
           </Card>
           
           <Card className="border-0 shadow-card bg-gradient-non-tech text-white">
             <CardContent className="p-6 text-center">
-              <div className="text-3xl font-bold mb-2">{nonTechnicalCount}/50</div>
+              <div className="text-3xl font-bold mb-2">{nonTechnicalCount}</div>
               <p className="text-sm opacity-90">Non-Technical Events</p>
             </CardContent>
           </Card>
