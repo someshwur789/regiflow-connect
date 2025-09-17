@@ -57,6 +57,25 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        technical: {
+          DEFAULT: "hsl(var(--technical))",
+          foreground: "hsl(var(--technical-foreground))",
+        },
+        "non-technical": {
+          DEFAULT: "hsl(var(--non-technical))",
+          foreground: "hsl(var(--non-technical-foreground))",
+        },
+      },
+      backgroundImage: {
+        "gradient-primary": "var(--gradient-primary)",
+        "gradient-tech": "var(--gradient-tech)",
+        "gradient-non-tech": "var(--gradient-non-tech)",
+        "gradient-background": "var(--gradient-background)",
+      },
+      boxShadow: {
+        card: "var(--shadow-card)",
+        elevated: "var(--shadow-elevated)",
+        glow: "var(--shadow-glow)",
       },
       borderRadius: {
         lg: "var(--radius)",

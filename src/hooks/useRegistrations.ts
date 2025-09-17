@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { Registration } from '@/types/registration';
+import { Registration, getTechnicalEvents, getNonTechnicalEvents } from '@/types/registration';
 
 export const useRegistrations = () => {
   const [registrations, setRegistrations] = useState<Registration[]>([]);
   const [totalCount, setTotalCount] = useState(0);
+  const [technicalCount, setTechnicalCount] = useState(0);
+  const [nonTechnicalCount, setNonTechnicalCount] = useState(0);
   const [loading, setLoading] = useState(true);
 
   const fetchRegistrations = async () => {
@@ -17,6 +19,16 @@ export const useRegistrations = () => {
       if (error) throw error;
       setRegistrations(data || []);
       setTotalCount(data?.length || 0);
+      
+      // Calculate category counts
+      const technicalEvents = getTechnicalEvents();
+      const nonTechnicalEvents = getNonTechnicalEvents();
+      
+      const techCount = data?.filter(reg => technicalEvents.includes(reg.event_name as any))?.length || 0;
+      const nonTechCount = data?.filter(reg => nonTechnicalEvents.includes(reg.event_name as any))?.length || 0;
+      
+      setTechnicalCount(techCount);
+      setNonTechnicalCount(nonTechCount);
     } catch (error) {
       console.error('Error fetching registrations:', error);
     } finally {
@@ -88,6 +100,8 @@ export const useRegistrations = () => {
   return {
     registrations,
     totalCount,
+    technicalCount,
+    nonTechnicalCount,
     loading,
     submitRegistration,
     checkEmailExists,

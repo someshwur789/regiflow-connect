@@ -4,10 +4,13 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { useRegistrations } from '@/hooks/useRegistrations';
 import { supabase } from '@/integrations/supabase/client';
-import type { EventName, Registration } from '@/types/registration';
+import { getEventConfig, type EventName, type Registration } from '@/types/registration';
+import { Upload, Users, FileText } from 'lucide-react';
 
 interface RegistrationFormProps {
   selectedEvent: EventName;
@@ -31,6 +34,8 @@ export function RegistrationForm({ selectedEvent, isDisabled }: RegistrationForm
   
   const { submitRegistration, checkEmailExists } = useRegistrations();
   const { toast } = useToast();
+  
+  const eventConfig = getEventConfig(selectedEvent);
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -84,8 +89,18 @@ export function RegistrationForm({ selectedEvent, isDisabled }: RegistrationForm
         return;
       }
 
+      // Validate team member requirements
+      if (eventConfig.maxTeamMembers === 2 && formData.team_member3.trim()) {
+        toast({
+          variant: 'destructive',
+          title: 'Team size exceeded',
+          description: `${selectedEvent} allows maximum ${eventConfig.maxTeamMembers} team members.`
+        });
+        return;
+      }
+
       let uploadedFilePath = null;
-      if (selectedEvent === 'Paper Quest' && file) {
+      if (eventConfig.requiresFile && file) {
         uploadedFilePath = await uploadFile(file, formData.email);
       }
 
@@ -101,7 +116,8 @@ export function RegistrationForm({ selectedEvent, isDisabled }: RegistrationForm
       if (result.success) {
         toast({
           title: 'Registration successful!',
-          description: `You have been registered for ${selectedEvent}. Check your email for the "On-Duty" request letter.`
+          description: `You have been registered for ${selectedEvent}. Check your email for the "On-Duty" request letter.`,
+          duration: 5000,
         });
         
         // Reset form
@@ -140,146 +156,229 @@ export function RegistrationForm({ selectedEvent, isDisabled }: RegistrationForm
     }
   };
 
-  const isPaperQuest = selectedEvent === 'Paper Quest';
-
   return (
-    <Card className="w-full max-w-2xl mx-auto">
-      <CardHeader>
-        <CardTitle>Register for {selectedEvent}</CardTitle>
+    <Card className="w-full max-w-3xl mx-auto border-0 shadow-elevated">
+      <CardHeader className="pb-6">
+        <div className="flex items-center justify-between">
+          <CardTitle className="text-xl flex items-center gap-3">
+            <div className={`p-2 rounded-lg ${eventConfig.category === 'Technical' ? 'bg-technical/10' : 'bg-non-technical/10'}`}>
+              {eventConfig.requiresFile ? <FileText className="h-5 w-5" /> : <Users className="h-5 w-5" />}
+            </div>
+            Register for {selectedEvent}
+          </CardTitle>
+          <div className="flex gap-2">
+            <Badge className={eventConfig.category === 'Technical' ? 'bg-technical text-technical-foreground' : 'bg-non-technical text-non-technical-foreground'}>
+              {eventConfig.category}
+            </Badge>
+            <Badge variant="outline">
+              Team Size: {eventConfig.maxTeamMembers}
+            </Badge>
+          </div>
+        </div>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="email">Email *</Label>
-              <Input
-                id="email"
-                type="email"
-                value={formData.email}
-                onChange={(e) => handleInputChange('email', e.target.value)}
-                required
-                disabled={isDisabled}
-              />
-            </div>
-            
-            <div>
-              <Label htmlFor="student_name">Student Name *</Label>
-              <Input
-                id="student_name"
-                value={formData.student_name}
-                onChange={(e) => handleInputChange('student_name', e.target.value)}
-                required
-                disabled={isDisabled}
-              />
-            </div>
-            
-            <div>
-              <Label htmlFor="college_name">College Name *</Label>
-              <Input
-                id="college_name"
-                value={formData.college_name}
-                onChange={(e) => handleInputChange('college_name', e.target.value)}
-                required
-                disabled={isDisabled}
-              />
-            </div>
-            
-            <div>
-              <Label htmlFor="department">Department *</Label>
-              <Input
-                id="department"
-                value={formData.department}
-                onChange={(e) => handleInputChange('department', e.target.value)}
-                required
-                disabled={isDisabled}
-              />
-            </div>
-            
-            <div>
-              <Label htmlFor="year">Year *</Label>
-              <Select onValueChange={(value) => handleInputChange('year', value)} disabled={isDisabled}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select year" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="1">1st Year</SelectItem>
-                  <SelectItem value="2">2nd Year</SelectItem>
-                  <SelectItem value="3">3rd Year</SelectItem>
-                  <SelectItem value="4">4th Year</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            
-            <div>
-              <Label htmlFor="phone">Phone Number</Label>
-              <Input
-                id="phone"
-                value={formData.phone}
-                onChange={(e) => handleInputChange('phone', e.target.value)}
-                disabled={isDisabled}
-              />
-            </div>
-          </div>
-          
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Personal Information */}
           <div className="space-y-4">
-            <div>
-              <Label htmlFor="team_member1">Team Member 1 *</Label>
-              <Input
-                id="team_member1"
-                value={formData.team_member1}
-                onChange={(e) => handleInputChange('team_member1', e.target.value)}
-                required
-                disabled={isDisabled}
-              />
-            </div>
-            
-            <div>
-              <Label htmlFor="team_member2">Team Member 2</Label>
-              <Input
-                id="team_member2"
-                value={formData.team_member2}
-                onChange={(e) => handleInputChange('team_member2', e.target.value)}
-                disabled={isDisabled}
-              />
-            </div>
-            
-            <div>
-              <Label htmlFor="team_member3">Team Member 3</Label>
-              <Input
-                id="team_member3"
-                value={formData.team_member3}
-                onChange={(e) => handleInputChange('team_member3', e.target.value)}
-                disabled={isDisabled}
-              />
+            <h3 className="text-lg font-semibold flex items-center gap-2">
+              Personal Information
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="email" className="text-sm font-medium">Email Address *</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) => handleInputChange('email', e.target.value)}
+                  required
+                  disabled={isDisabled}
+                  className="mt-1"
+                  placeholder="your.email@college.edu"
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="student_name" className="text-sm font-medium">Full Name *</Label>
+                <Input
+                  id="student_name"
+                  value={formData.student_name}
+                  onChange={(e) => handleInputChange('student_name', e.target.value)}
+                  required
+                  disabled={isDisabled}
+                  className="mt-1"
+                  placeholder="Your full name"
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="college_name" className="text-sm font-medium">College/University *</Label>
+                <Input
+                  id="college_name"
+                  value={formData.college_name}
+                  onChange={(e) => handleInputChange('college_name', e.target.value)}
+                  required
+                  disabled={isDisabled}
+                  className="mt-1"
+                  placeholder="Your college name"
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="department" className="text-sm font-medium">Department *</Label>
+                <Input
+                  id="department"
+                  value={formData.department}
+                  onChange={(e) => handleInputChange('department', e.target.value)}
+                  required
+                  disabled={isDisabled}
+                  className="mt-1"
+                  placeholder="e.g., Computer Science"
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="year" className="text-sm font-medium">Academic Year *</Label>
+                <Select onValueChange={(value) => handleInputChange('year', value)} disabled={isDisabled} required>
+                  <SelectTrigger className="mt-1">
+                    <SelectValue placeholder="Select your year" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="1">1st Year</SelectItem>
+                    <SelectItem value="2">2nd Year</SelectItem>
+                    <SelectItem value="3">3rd Year</SelectItem>
+                    <SelectItem value="4">4th Year</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div>
+                <Label htmlFor="phone" className="text-sm font-medium">Phone Number</Label>
+                <Input
+                  id="phone"
+                  value={formData.phone}
+                  onChange={(e) => handleInputChange('phone', e.target.value)}
+                  disabled={isDisabled}
+                  className="mt-1"
+                  placeholder="+91 9876543210"
+                />
+              </div>
             </div>
           </div>
           
-          {isPaperQuest && (
-            <div>
-              <Label htmlFor="file">Upload Presentation (PPT, PPTX, PDF) *</Label>
-              <Input
-                id="file"
-                type="file"
-                accept=".ppt,.pptx,.pdf"
-                onChange={handleFileChange}
-                required={isPaperQuest}
-                disabled={isDisabled}
-              />
-              {file && (
-                <p className="text-sm text-muted-foreground mt-1">
-                  Selected: {file.name}
-                </p>
+          {/* Team Information */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold flex items-center gap-2">
+              <Users className="h-5 w-5" />
+              Team Members
+            </h3>
+            <Alert className="border-primary/20 bg-primary/5">
+              <AlertDescription>
+                <strong>Team Size:</strong> Maximum {eventConfig.maxTeamMembers} members allowed for {selectedEvent}.
+                {eventConfig.maxTeamMembers === 3 ? ' You can add up to 2 additional team members.' : ' You can add 1 additional team member.'}
+              </AlertDescription>
+            </Alert>
+            
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="team_member1" className="text-sm font-medium">Team Member 1 (You) *</Label>
+                <Input
+                  id="team_member1"
+                  value={formData.team_member1}
+                  onChange={(e) => handleInputChange('team_member1', e.target.value)}
+                  required
+                  disabled={isDisabled}
+                  className="mt-1"
+                  placeholder="Your name (team leader)"
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="team_member2" className="text-sm font-medium">Team Member 2</Label>
+                <Input
+                  id="team_member2"
+                  value={formData.team_member2}
+                  onChange={(e) => handleInputChange('team_member2', e.target.value)}
+                  disabled={isDisabled}
+                  className="mt-1"
+                  placeholder="Second team member (optional)"
+                />
+              </div>
+              
+              {eventConfig.maxTeamMembers === 3 && (
+                <div>
+                  <Label htmlFor="team_member3" className="text-sm font-medium">Team Member 3</Label>
+                  <Input
+                    id="team_member3"
+                    value={formData.team_member3}
+                    onChange={(e) => handleInputChange('team_member3', e.target.value)}
+                    disabled={isDisabled}
+                    className="mt-1"
+                    placeholder="Third team member (optional)"
+                  />
+                </div>
               )}
+            </div>
+          </div>
+          
+          {/* File Upload for Paper Quest */}
+          {eventConfig.requiresFile && (
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold flex items-center gap-2">
+                <Upload className="h-5 w-5" />
+                Presentation Upload
+              </h3>
+              <Alert className="border-primary/20 bg-primary/5">
+                <AlertDescription>
+                  <strong>Required:</strong> Upload your presentation file (PPT, PPTX, or PDF). 
+                  This file will be available for download in the admin panel.
+                </AlertDescription>
+              </Alert>
+              <div>
+                <Label htmlFor="file" className="text-sm font-medium">Upload Presentation (PPT, PPTX, PDF) *</Label>
+                <Input
+                  id="file"
+                  type="file"
+                  accept=".ppt,.pptx,.pdf"
+                  onChange={handleFileChange}
+                  required={eventConfig.requiresFile}
+                  disabled={isDisabled}
+                  className="mt-1"
+                />
+                {file && (
+                  <div className="mt-2 p-3 bg-muted/50 rounded-lg">
+                    <p className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                      <FileText className="h-4 w-4" />
+                      Selected: {file.name}
+                    </p>
+                  </div>
+                )}
+              </div>
             </div>
           )}
           
           <Button 
             type="submit" 
-            className="w-full"
+            className="w-full h-12 text-base font-semibold bg-gradient-primary hover:opacity-90 transition-opacity"
             disabled={isDisabled || submitting}
           >
-            {submitting ? 'Registering...' : 'Register'}
+            {submitting ? (
+              <div className="flex items-center gap-2">
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                Registering...
+              </div>
+            ) : (
+              `Register for ${selectedEvent}`
+            )}
           </Button>
+          
+          {isDisabled && (
+            <Alert className="border-destructive/20 bg-destructive/5">
+              <AlertDescription className="text-destructive">
+                Registration is currently closed for {eventConfig.category.toLowerCase()} events.
+              </AlertDescription>
+            </Alert>
+          )}
         </form>
       </CardContent>
     </Card>
