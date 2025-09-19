@@ -190,7 +190,7 @@ export function RegistrationForm({
               
               <div>
                 <Label htmlFor="department" className="text-sm font-medium">Department *</Label>
-                <Input id="department" value={formData.department} onChange={e => handleInputChange('department', e.target.value)} required disabled={isDisabled} className="mt-1" placeholder="e.g., Computer Science" />
+                <Input id="department" value={formData.department} onChange={e => handleInputChange('department', e.target.value)} required disabled={isDisabled} className="mt-1" placeholder="e.g., Artificial Intelligence & Data Science" />
               </div>
               
               <div>
