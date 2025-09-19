@@ -67,7 +67,7 @@ export function RegistrationForm({
     const {
       data,
       error
-    } = await supabase.storage.from('paper-quest-uploads').upload(fileName, file);
+    } = await supabase.storage.from('showcase-uploads').upload(fileName, file);
     if (error) throw error;
     return data.path;
   };
@@ -75,6 +75,17 @@ export function RegistrationForm({
     e.preventDefault();
     setSubmitting(true);
     try {
+      // Validate phone number - must be exactly 10 digits
+      if (formData.phone && !/^\d{10}$/.test(formData.phone.replace(/\D/g, ''))) {
+        toast({
+          variant: 'destructive',
+          title: 'Invalid phone number',
+          description: 'Phone number must be exactly 10 digits.'
+        });
+        setSubmitting(false);
+        return;
+      }
+
       // Check if email already exists
       const emailExists = await checkEmailExists(formData.email);
       if (emailExists) {
@@ -209,8 +220,22 @@ export function RegistrationForm({
               </div>
               
               <div>
-                <Label htmlFor="phone" className="text-sm font-medium">Phone Number</Label>
-                <Input id="phone" value={formData.phone} onChange={e => handleInputChange('phone', e.target.value)} disabled={isDisabled} className="mt-1" placeholder="+91 9876543210" />
+                <Label htmlFor="phone" className="text-sm font-medium">Phone Number *</Label>
+                <Input 
+                  id="phone" 
+                  value={formData.phone} 
+                  onChange={e => {
+                    // Only allow digits and limit to 10 characters
+                    const value = e.target.value.replace(/\D/g, '').slice(0, 10);
+                    handleInputChange('phone', value);
+                  }} 
+                  disabled={isDisabled} 
+                  className="mt-1" 
+                  placeholder="9876543210" 
+                  type="tel"
+                  required
+                />
+                <p className="text-xs text-muted-foreground mt-1">Enter 10-digit phone number</p>
               </div>
             </div>
           </div>
@@ -218,7 +243,7 @@ export function RegistrationForm({
           {/* Team Information */}
           
           
-          {/* File Upload for Paper Quest */}
+          {/* File Upload for Paper Showcase */}
           {eventConfig.requiresFile && <div className="space-y-4">
               <h3 className="text-lg font-semibold flex items-center gap-2">
                 <Upload className="h-5 w-5" />

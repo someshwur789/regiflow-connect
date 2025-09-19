@@ -18,15 +18,15 @@ CREATE TABLE public.registrations (
 -- Disable RLS as requested
 ALTER TABLE public.registrations DISABLE ROW LEVEL SECURITY;
 
--- Create storage bucket for paper quest uploads
-INSERT INTO storage.buckets (id, name, public) VALUES ('paper-quest-uploads', 'paper-quest-uploads', false);
+-- Create storage bucket for showcase uploads
+INSERT INTO storage.buckets (id, name, public) VALUES ('showcase-uploads', 'showcase-uploads', false);
 
 -- Create storage policies for file uploads
 CREATE POLICY "Allow public file uploads" ON storage.objects
-FOR INSERT WITH CHECK (bucket_id = 'paper-quest-uploads');
+FOR INSERT WITH CHECK (bucket_id = 'showcase-uploads');
 
 CREATE POLICY "Allow public file downloads" ON storage.objects
-FOR SELECT USING (bucket_id = 'paper-quest-uploads');
+FOR SELECT USING (bucket_id = 'showcase-uploads');
 
 -- Create index for better query performance
 CREATE INDEX idx_registrations_email ON public.registrations(email);

@@ -14,7 +14,7 @@ export interface Registration {
   created_at?: string;
 }
 
-export type EventName = 'Paper Quest' | 'Hack\'n\'Hammer' | 'Byte Fest' | 'Cinephile' | 'e-sports';
+export type EventName = 'Paper Showcase' | 'Hack\'n\'Hammer' | 'Byte Fest' | 'Cinephile' | 'E-Sports';
 
 export type EventCategory = 'Technical' | 'Non-Technical';
 
@@ -28,7 +28,7 @@ export interface EventConfig {
 
 export const EVENT_CONFIGS: EventConfig[] = [
   {
-    name: 'Paper Quest',
+    name: 'Paper Showcase',
     category: 'Technical',
     maxTeamMembers: 3,
     requiresFile: true,
@@ -56,7 +56,7 @@ export const EVENT_CONFIGS: EventConfig[] = [
     maxRegistrations: 20
   },
   {
-    name: 'e-sports',
+    name: 'E-Sports',
     category: 'Non-Technical',
     maxTeamMembers: 2,
     requiresFile: false,

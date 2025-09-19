@@ -52,7 +52,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
   const downloadFile = async (filePath: string, fileName: string) => {
     try {
       const { data, error } = await supabase.storage
-        .from('paper-quest-uploads')
+        .from('showcase-uploads')
         .createSignedUrl(filePath, 3600); // 1 hour expiry
 
       if (error) throw error;
