@@ -67,7 +67,7 @@ export function RegistrationForm({
     const {
       data,
       error
-    } = await supabase.storage.from('showcase-uploads').upload(fileName, file);
+    } = await supabase.storage.from('paper-quest-uploads').upload(fileName, file);
     if (error) throw error;
     return data.path;
   };
