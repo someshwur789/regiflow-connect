@@ -1,4 +1,4 @@
-#Project Overview
+# Project Overview
 
 - The AURA-25 project is a web-based application developed for our college symposium. It serves as a centralized platform for students and participants to explore and register for various events conducted by our department.
 
