@@ -1,73 +1,53 @@
-# Welcome to your Lovable project
+#Project Overview
 
-## Project info
+- The AURA-25 project is a web-based application developed for our college symposium. It serves as a centralized platform for students and participants to explore and register for various events conducted by our department.
 
-**URL**: https://lovable.dev/projects/28e8908e-d4ad-4421-a1cc-adbf6475132a
+- This website provides detailed information about all the events conducted during the symposium and enables users to easily access and participate in them through a simple registration process.
 
-## How can I edit this code?
+---
 
-There are several ways of editing your application.
+<h3 style="font-size:20px;">🚀 Features</h3>
 
-**Use Lovable**
+- 📋 View all symposium events registration in one place
+- 📝 Easy event registration system
+- 📅 Event details including date, time, and description
+- 👨‍🎓 User-friendly interface for students and participants
+- 📱 Responsive design (accessible on mobile & desktop)
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/28e8908e-d4ad-4421-a1cc-adbf6475132a) and start prompting.
+---
 
-Changes made via Lovable will be committed automatically to this repo.
+<h3 style="font-size:20px;">🛠️ Technologies Used</h3>
 
-**Use your preferred IDE**
+- Frontend: HTML, CSS, JavaScript, ReactJS
+- Backend: NodeJS, Python, Java
+- Database: Supabase
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+---
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+<h3 style="font-size:20px;">⚙️ Installation & Setup</h3>
 
-Follow these steps:
+- Clone the repository
+- Navigate to the project folder: cd aura-24
+- Install dependencies: npm i
+- Run the project: npm run dev
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+---
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+<h3 style="font-size:20px;">🌐 Usage</h3>
 
-# Step 3: Install the necessary dependencies.
-npm i
+- Open the website
+- Browse available events
+- Select your desired event
+- Complete the registration process
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
+---
 
-**Edit a file directly in GitHub**
+<h3 style="font-size:20px;">🎯 Purpose</h3>
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+The main goal of this project is to simplify the registration process for our department symposium by providing a digital platform that is efficient, accessible, and easy to use.
 
-**Use GitHub Codespaces**
+---
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+<h3 style="font-size:20px;">📄 License</h3>
 
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/28e8908e-d4ad-4421-a1cc-adbf6475132a) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+This project is developed for educational purposes and symposium use only.
