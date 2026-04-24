@@ -27,7 +27,7 @@
 <h3 style="font-size:20px;">⚙️ Installation & Setup</h3>
 
 - Clone the repository
-- Navigate to the project folder: cd aura-24
+- Navigate to the project folder: cd Tab
 - Install dependencies: npm i
 - Run the project: npm run dev
 
